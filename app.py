@@ -14,8 +14,7 @@ from util import *
 
 
 force_cpu = False
-model = "drive/MyDrive/outputs/00002-rezeption-auto1/network-snapshot-002400.pkl"
-
+model = "metfaces.pkl"
 
 def init_w(G):
     if os.path.isfile("w1.npy"):
@@ -46,7 +45,7 @@ def main():
     
     # Settings
     interpolation_steps = st.sidebar.slider("Interpolation steps", min_value=2, max_value=15, step=1)
-    projection_steps = st.sidebar.slider("Projection iterations", min_value=20, max_value=1000, step=20)
+    projection_steps = st.sidebar.slider("Projection iterations", min_value=100, max_value=10000, step=100)
     
     # Randomize start image
     if st.sidebar.button("Randomize Alpha", key="r1"):
