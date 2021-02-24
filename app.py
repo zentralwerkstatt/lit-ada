@@ -5,12 +5,16 @@ import sys
 import pickle
 import torch as t
 from io import BytesIO
+import zipfile
+import base64
+from datetime import datetime
+import PIL.Image
 sys.path.append('../stylegan2-ada-pytorch')
 from util import *
 
 
 force_cpu = False
-model = "ffhq.s2ada.pkl"
+model = "drive/MyDrive/outputs/00002-rezeption-auto1/network-snapshot-002400.pkl"
 
 
 def init_w(G):
@@ -79,6 +83,21 @@ def main():
     # Compute interpolation
     ws = lerp_w(w1[0], w2[0], interpolation_steps)
     imgs = deprocess_img(G.synthesis(preprocess_w(ws), noise_mode='const', force_fp32=True))
+    
+    if st.sidebar.button("Download images", key="d"):
+        date_time = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+        zip_fname = f"{date_time}.zip"
+        f = zipfile.ZipFile(zip_fname, "w", zipfile.ZIP_DEFLATED)
+        for n, img in enumerate(imgs):
+          fname = f"{n}.jpg"
+          PIL.Image.fromarray(img).save(fname)
+          f.write(fname)
+        with open(zip_fname, "rb") as f:
+          bytes = f.read()
+          b64 = base64.b64encode(bytes).decode()
+          href = f'<a download={zip_fname} href="data:application/zip;base64,{b64}">{zip_fname}</a>'
+          st.sidebar.markdown(href, unsafe_allow_html=True)
+    
     for i in range(1, len(imgs)-1):
         st.image(imgs[i], key=i)
     
